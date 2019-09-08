@@ -21,13 +21,5 @@ namespace Horse_Dev
             Admistration.Click();
         }
 
-       
-
-        
-
-        
-
-        
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Horse_Dev.com.hordev.common;
+using Horse_Dev.com.hordev.utilities;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -18,6 +19,7 @@ namespace Horse_Dev.com.horsedev.test
         //[SetUp]
         public void BeforeMethod()
         {
+           
             driver = Initialize();
             LP = new LoginPage (driver);
         }

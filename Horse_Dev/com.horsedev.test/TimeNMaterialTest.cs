@@ -1,4 +1,5 @@
 ﻿using Horse_Dev.com.hordev.common;
+using Horse_Dev.com.hordev.utilities;
 using Horse_Dev.com.horsedev.pages;
 using NUnit.Framework;
 using OpenQA.Selenium;
@@ -19,9 +20,10 @@ namespace Horse_Dev.com.horsedev.test
         [SetUp]
         public void BeforeMethod()
         {
+            
             driver = Initialize();
             LP = new LoginPage(driver);
-            LP.LoginSuccess("hari", "123123");
+            LP.LoginTest("hari", "123123");
             HPage = new HomePage(driver);
             TnM = new TimeNMaterial(driver);
         }
@@ -31,7 +33,7 @@ namespace Horse_Dev.com.horsedev.test
         {
             HPage.ClickOnAdministration();
             TnM.ClickTimenMaterial();
-            TnM.ClickOnCreateNew();
+           // TnM.ClickOnCreateNew();
             IWebElement dropDown = driver.FindElement(By.XPath("//span[@role=\"listbox\"] //span[@class=\"k-icon k-i-arrow-s\"]"));
             dropDown.Click();
             List<IWebElement> DropDownList = new List<IWebElement>(driver.FindElements(By.XPath("//ul[contains(@id,'TypeCode_listbox')]//li")));
@@ -50,17 +52,22 @@ namespace Horse_Dev.com.horsedev.test
             TnM.ClickOnSave();
         }
 
-        [Test]
+       [Test]
         public void ValidateItemTest()
         {
+           // TnM.ValidateItemTest("Code@");
             HPage.ClickOnAdministration();
             TnM.ClickTimenMaterial();
-            WebDriverWait Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            // WebDriverWait Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             while (true)
             {
                 for (int i = 1; i <= 10; i++)
                 {
-                    IWebElement VerifyCode = Wait.Until(ExpectedConditions.ElementIsVisible((By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]"))));
+                    Thread.Sleep(5000);
+                    string waitingEle = "//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]";
+                
+                    WaitHelper.ElementVisible(driver, waitingEle, "xpath");
+                    var VerifyCode = driver.FindElement(By.XPath(waitingEle));
                     if (VerifyCode.Text == "CODE@")
                     {
                         Console.WriteLine("Code exists");
@@ -81,13 +88,16 @@ namespace Horse_Dev.com.horsedev.test
         {
             HPage.ClickOnAdministration();
             TnM.ClickTimenMaterial();
-            WebDriverWait Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            Thread.Sleep(5000);
             while (true)
             {
                 for (int i = 1; i <= 10; i++)
                 {
-                    IWebElement VerifyCode = Wait.Until(ExpectedConditions.ElementIsVisible((By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]"))));
-                    if (VerifyCode.Text == "CODE@")
+                    string waitingEle = "//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]";
+                    WaitHelper.ElementVisible(driver, waitingEle, "xpath");
+                    var VerifyCode = driver.FindElement(By.XPath(waitingEle));
+
+                    if (VerifyCode.Text == "1234")
                     {
                         IWebElement EditBtn = driver.FindElement(By.XPath("(//a[contains(@class,'k-button k-button-icontext k-grid-Edit')])[" + i + "]"));
                         EditBtn.Click();
@@ -113,12 +123,13 @@ namespace Horse_Dev.com.horsedev.test
         {
             HPage.ClickOnAdministration();
             TnM.ClickTimenMaterial();
-            TnM.DeleteItem("test");
+            TnM.DeleteRecord("test");
         }
 
         [TearDown]
         public void AfterMethod()
         {
+
             driver.Quit();
         }
     }

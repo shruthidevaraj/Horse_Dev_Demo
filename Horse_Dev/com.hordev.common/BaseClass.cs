@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Horse_Dev.com.hordev.common
 {
-    class BaseClass
+    public class BaseClass
     {
-        IWebDriver driver;
+       internal IWebDriver driver;
 
         public IWebDriver Initialize()
         {
-            driver = new ChromeDriver();
+            driver = new ChromeDriver(); //research about global driver or browser factory 
             driver.Navigate().GoToUrl("http://horse-dev.azurewebsites.net/Account/Login?ReturnUrl=%2f");
             driver.Manage().Window.Maximize();
             return driver;

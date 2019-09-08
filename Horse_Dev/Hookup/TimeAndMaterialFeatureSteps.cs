@@ -1,61 +1,123 @@
-﻿using Horse_Dev.com.horsedev.pages;
+﻿
 using Horse_Dev.com.hordev.common;
+using Horse_Dev.com.hordev.utilities;
+using Horse_Dev.com.horsedev.pages;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using System;
 using TechTalk.SpecFlow;
-using OpenQA.Selenium.Chrome;
-using System.Collections.Generic;
 
 namespace Horse_Dev.Hookup
 {
     [Binding]
-    public class TimeAndMaterialFeatureSteps
+    public class TimeAndMaterialFeatureSteps : Steps
     {
         IWebDriver driver;
-        LoginPage LP;
-        HomePage HPage;
-        TimeNMaterial TnM;
+        LoginPage loginInstance;
+        HomePage homepInstace;
+        TimeNMaterial timeNMaterial;
+        BaseClass baseInstance = null;
+        ExcelDataUtil DataUtil;
 
-        [Given(@"I have Lgged in to the portal")]
+        [Given(@"I have Logged into the portal")]
         public void GivenIHaveLggedInToThePortal()
         {
-            driver = new ChromeDriver();
-            driver.Navigate().GoToUrl("http://horse-dev.azurewebsites.net/Account/Login?ReturnUrl=%2f");
-            driver.Manage().Window.Maximize();
-            LP = new LoginPage(driver);
-            LP.LoginSuccess("hari", "123123");
+
+            baseInstance = new BaseClass();
+            driver = baseInstance.Initialize();
+            loginInstance = new LoginPage(driver);
+            loginInstance.LoginTest("hari", "123123");
+            DataUtil = new ExcelDataUtil();
            
         }
-        
+
+       
         [Given(@"I have to navigate to Time and material page")]
         public void GivenIHaveToNavigateToTimeAndMaterialPage()
         {
-           
-            HPage.ClickOnAdministration();
-            TnM.ClickTimenMaterial();
-            TnM.ClickOnCreateNew();
-          }
+            homepInstace = new HomePage(driver);
+            timeNMaterial = new TimeNMaterial(driver);
+            homepInstace.ClickOnAdministration();
+            timeNMaterial.ClickTimenMaterial();
+        }
+
         
         [Then(@"I should be able to create time and material sucessfully")]
         public void ThenIShouldBeAbleToCreateTimeAndMaterialSucessfully()
         {
-           // TnM.CreateNewItem("Code123", "Description Code 123", "40", "Time");
-            IWebElement dropDown = driver.FindElement(By.XPath("//span[@role=\"listbox\"] //span[@class=\"k-icon k-i-arrow-s\"]"));
-            dropDown.Click();
-            List<IWebElement> DropDownList = new List<IWebElement>(driver.FindElements(By.XPath("//ul[contains(@id,'TypeCode_listbox')]//li")));
+            DataUtil.GetDataInCollection("C:\\Users\\Shruthi Devaraj\\Desktop\\Me\\TimeAndMaterialTestData.xlsx", "TimeAndMaterial");
+            string Code = DataUtil.ReadData(2, "Code");
+            string TypeCode = DataUtil.ReadData(2, "TypeCode");
 
-            for (int i = 0; i < DropDownList.Count; i++)
-            {
+            string Description = DataUtil.ReadData(2, "Description");
+            Console.WriteLine(DataUtil.ReadData(2, "Price"));
+            //string Price = DataUtil.ReadData(2, "Price");
+            string Price = "100";
+            timeNMaterial.CreateNewRecord(Code, Description, Price, TypeCode);
 
-                if (DropDownList[i].Text == "Time")
-                {
-                    DropDownList[i].Click();
-                }
-            }
-            TnM.SetCode("Code123");
-            TnM.SetDescription("Description Code 123");
-            TnM.SetPricePerUnit("10000");
-            TnM.ClickOnSave(); ;
         }
+
+        [Then(@"search for particular Time/Material Item and verify if Time/Material is present")]
+        public void ThenSearchForParticularTimeMaterialItemAndVerifyIfTimeMaterialIsPresent()
+        {
+            DataUtil.GetDataInCollection("C:\\Users\\Shruthi Devaraj\\Desktop\\Me\\TimeAndMaterialTestData.xlsx", "ValidateRecord");
+            Given("I have Logged into the portal");
+            Given("I have to navigate to Time and material page");
+            String CodeToValidate = DataUtil.ReadData(1,"Code");
+            int result = timeNMaterial.ValidateRecord("CodeToValidate");
+            Assert.IsTrue(result > 0,"Time Material record Exists");
+        }
+
+        [Given(@"I have to search for Item which needs to be edited")]
+        public void GivenIHaveToSearchForItemWhichNeedsToBeEdited()
+        {
+            Given("I have Logged into the portal");
+            Given("I have to navigate to Time and material page");
+        }
+
+        [Then(@"Edit and save it and verify if the Time/material item is edited")]
+        public void ThenEditAndSaveItAndVerifyIfTheTimeMaterialItemIsEdited()
+        {
+
+            DataUtil.GetDataInCollection("C:\\Users\\Shruthi Devaraj\\Desktop\\Me\\TimeAndMaterialTestData.xlsx", "EditTimeAndMaterial");
+
+            string CodeToEdit = DataUtil.ReadData(2, "Code");
+            string NewCode = DataUtil.ReadData(2, "NewCode");
+            string Description = DataUtil.ReadData(2, "Description");
+
+            string TypeCode = DataUtil.ReadData(2, "TypeCode");
+            int result = timeNMaterial.EditRecord(CodeToEdit,NewCode,Description,"100",TypeCode);
+            Assert.IsTrue(result > 0,"REcord Editted successfully");
+        }
+
+        [Given(@"I have to search for Item which needs to be deleted and delete it")]
+        public void GivenIHaveToSearchForItemWhichNeedsToBeDeletedAndDeleteIt()
+        {
+            Given("I have Logged into the portal");
+            Given("I have to navigate to Time and material page");
+        }
+
+        [Then(@"verify if Time/Material is deleted")]
+        public void ThenVerifyIfTimeMaterialIsDeleted()
+        {
+            DataUtil.GetDataInCollection("C:\\Users\\Shruthi Devaraj\\Desktop\\Me\\TimeAndMaterialTestData.xlsx", "DeleteTimeAndMaterial");
+            string Code = DataUtil.ReadData(2, "Code");
+            int result = timeNMaterial.DeleteRecord(Code);
+            Assert.IsTrue(result > 0,"Record deleted successfully");
+            driver.Quit();
+
+        }
+
+
+        [AfterScenario]
+        public void Diposable()
+        {
+            if (driver != null)
+            {
+                driver.Quit();
+            }
+        }
+
+
     }
 }

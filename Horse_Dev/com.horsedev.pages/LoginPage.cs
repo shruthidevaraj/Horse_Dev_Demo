@@ -31,7 +31,8 @@ namespace Horse_Dev
             LoginButton.Click();
         }
         
-        internal void LoginSuccess(String Username, String password)
+        //
+        internal void LoginTest(String Username, String password)
         {
             SetUserName(Username);
             SetPassword(password);

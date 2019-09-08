@@ -20,9 +20,9 @@ namespace Horse_Dev.com.horsedev.test
         [SetUp]
         public void BeforeMethod()
         {
-         driver= Initialize();
+         Initialize();
          LgnPage = new LoginPage(driver);
-         LgnPage.LoginSuccess("hari","123123");
+         LgnPage.LoginTest("hari","123123");
          HPage = new HomePage(driver);
 
         }
